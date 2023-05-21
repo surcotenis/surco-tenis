@@ -34,7 +34,11 @@ router.post('/login', [
     const token = jwt.sign({ clienteId: cliente.id }, process.env.JWT_SEC); // Aquí debes utilizar tu propia clave secreta
 
     // Iniciar sesión exitosamente y devolver el token
-    return res.status(200).json({ token });
+    return res.status(200).json({ 
+      token:token,
+      codCliente:cliente.codCliente,
+      nombre:cliente.nombres
+     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error en el inicio de sesión' });

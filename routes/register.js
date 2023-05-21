@@ -5,7 +5,7 @@ const { check, validationResult } = require('express-validator');
 const  Cliente  = require('../models/Clientes'); // Asumiendo que tienes un modelo llamado Cliente
 
 // Ruta de registro
-router.post('/register', [
+router.post('/', [
   check('numDocumento').notEmpty().withMessage('El número de documento es requerido'),
   check('nombres').notEmpty().withMessage('El nombre es requerido'),
   check('email').notEmpty().withMessage('El correo electrónico es requerido').isEmail().withMessage('El correo electrónico no es válido'),
@@ -18,8 +18,9 @@ router.post('/register', [
     return res.status(422).json({ errors: errors.array() });
   }
 
+
   try {
-    const { numDocumento, nombres, email, telefono, password } = req.body;
+    const { numDocumento, nombres, email, telefono, password ,tipo_documento,primer_apellido,segundo_apellido,nivel,posicion,genero } = req.body;
 
     // Verificar si el cliente ya está registrado
    const existingCliente = await Cliente.findOne( { email } );
@@ -37,6 +38,12 @@ router.post('/register', [
         estado: 'ACTIVO',
         tipo: 'CLIENTE',
         creacion: new Date().toISOString(),
+        tipo_documento,
+        primer_apellido,
+        segundo_apellido,
+        nivel,
+        posicion,
+        genero
       };
       const clienteId = await Cliente.create(clienteData);
 
