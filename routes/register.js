@@ -20,7 +20,8 @@ router.post('/', [
 
 
   try {
-    const { numDocumento, nombres, email, telefono, password ,tipo_documento,primer_apellido,segundo_apellido,nivel,posicion,genero } = req.body;
+    const { numDocumento, nombres, email, telefono, password ,
+      /*tipo_documento,primer_apellido,segundo_apellido,nivel,posicion,genero*/ } = req.body;
 
     // Verificar si el cliente ya está registrado
    const existingCliente = await Cliente.findOne( { email } );
@@ -38,12 +39,12 @@ router.post('/', [
         estado: 'ACTIVO',
         tipo: 'CLIENTE',
         creacion: new Date().toISOString(),
-        tipo_documento,
+        /*tipo_documento,
         primer_apellido,
         segundo_apellido,
         nivel,
         posicion,
-        genero
+        genero*/
       };
       const clienteId = await Cliente.create(clienteData);
 
