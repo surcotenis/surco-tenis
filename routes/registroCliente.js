@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../core/db_config'); // Importa el módulo para acceder a la base de datos
 const moment = require('moment');
-
+const {verifyToken, verifyTokenAndAuthorization} =require("./verifyToken")
 
 router.get('/listar/', (req, res) => {
   const id = req.body.id;
@@ -58,9 +58,8 @@ console.log({id})
 });
 
 // Ruta para guardar el registro
-router.post('/guardar', (req, res) => {
+router.post('/guardar',verifyToken, (req, res) => {
   const input = req.body;
-  console.log({input})
   //db.query(
   //  'SELECT * FROM caja WHERE codLocalidad = ? AND montoCierre IS NULL',
   //  [input.ddlLocalidad],
