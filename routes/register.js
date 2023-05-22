@@ -12,6 +12,13 @@ router.post('/', [
   check('telefono').notEmpty().withMessage('El número de teléfono es requerido'),
   check('password').notEmpty().withMessage('La contraseña es requerida').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
   check('passwordConfirmation').notEmpty().withMessage('La confirmación de contraseña es requerida').custom((value, { req }) => value === req.body.password).withMessage('La confirmación de contraseña no coincide'),
+  check('tipo_documento').notEmpty().withMessage('El tipo de documento es requerido'),
+  check('primer_apellido').notEmpty().withMessage('El primer apellido es requerido'),
+  check('segundo_apellido').notEmpty().withMessage('El segundo apellido es requerido'),
+  check('nivel').notEmpty().withMessage('El nivel es requerido'),
+  check('posicion').notEmpty().withMessage('El nivel es requerido'),
+  check('genero').notEmpty().withMessage('El nivel es requerido'),
+
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -20,8 +27,19 @@ router.post('/', [
 
 
   try {
-    const { numDocumento, nombres, email, telefono, password ,
-      /*tipo_documento,primer_apellido,segundo_apellido,nivel,posicion,genero*/ } = req.body;
+    const { 
+            numDocumento,
+            nombres,
+            email,
+            telefono,
+            password,
+            tipo_documento,
+            primer_apellido,
+            segundo_apellido,
+            nivel,
+            posicion,
+            genero
+          } = req.body;
 
     // Verificar si el cliente ya está registrado
    const existingCliente = await Cliente.findOne( { email } );
@@ -39,12 +57,12 @@ router.post('/', [
         estado: 'ACTIVO',
         tipo: 'CLIENTE',
         creacion: new Date().toISOString(),
-        /*tipo_documento,
+        tipo_documento,
         primer_apellido,
         segundo_apellido,
         nivel,
         posicion,
-        genero*/
+        genero
       };
       const clienteId = await Cliente.create(clienteData);
 
