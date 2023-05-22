@@ -64,14 +64,6 @@ language = "nodejs"
 
 [nix]
 channel = "stable-22_11"
-{ pkgs }: {
-	deps = [
-		pkgs.nodejs-18_x
-    pkgs.nodePackages.typescript-language-server
-    pkgs.yarn
-    pkgs.replitPackages.jest
-	];
-}
 
 [env]
 XDG_CONFIG_HOME = "/home/runner/$REPL_SLUG/.config"
