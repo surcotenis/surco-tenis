@@ -19,7 +19,7 @@ router.post('/', [
   check('nivel').notEmpty().withMessage('El nivel es requerido'),
   check('posicion').notEmpty().withMessage('El nivel es requerido'),
   check('genero').notEmpty().withMessage('El nivel es requerido'),
-  //check('fecha_nacimiento').notEmpty().withMessage('El fecha de nacimiento es requerido'),
+  check('fechNac').notEmpty().withMessage('El fecha de nacimiento es requerido'),
 
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -41,7 +41,7 @@ router.post('/', [
             nivel,
             posicion,
             genero,
-            /*fecha_nacimiento*/
+            fechNac
           } = req.body;
 
     // Verificar si el cliente ya está registrado
@@ -66,7 +66,7 @@ router.post('/', [
         nivel,
         posicion,
         genero,
-        /*fecha_nacimiento*/
+        fechNac
       };
       const clienteId = await Cliente.create(clienteData);
       // Envío del correo electrónico
