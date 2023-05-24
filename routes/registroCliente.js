@@ -5,9 +5,7 @@ const moment = require('moment');
 const {verifyToken, verifyTokenAndAuthorization} =require("./verifyToken")
 
 router.get('/listar/', (req, res) => {
-  console.log({req})
   const id = req.query.id;
-console.log({id})
   const sql = `
     SELECT
       registro.codRegistro,

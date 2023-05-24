@@ -11,6 +11,7 @@ const authRouter = require("./routes/auth")
 //const loginRouter = require("./routes/login")
 const listadoRegistro = require("./routes/listadoRegistro")
 const registroCliente = require("./routes/registroCliente")
+const localidadRouter = require("./routes/localidad")
 
 
 app.use(express.json())
@@ -29,6 +30,7 @@ app.use("/api/register",registerRouter)
 app.use("/api/auth",authRouter)
 app.use("/api/listado-Registro", listadoRegistro)
 app.use("/api/registro-cliente", registroCliente)
+app.use("/api/localidad", localidadRouter)
 
 
 dbConnection.connect((error) => {
