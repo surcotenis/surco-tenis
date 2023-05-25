@@ -12,7 +12,7 @@ const authRouter = require("./routes/auth")
 const listadoRegistro = require("./routes/listadoRegistro")
 const registroCliente = require("./routes/registroCliente")
 const localidadRouter = require("./routes/localidad")
-
+const clienteRouter = require("./routes/cliente")
 
 app.use(express.json())
 app.use(cors())
@@ -31,7 +31,7 @@ app.use("/api/auth",authRouter)
 app.use("/api/listado-Registro", listadoRegistro)
 app.use("/api/registro-cliente", registroCliente)
 app.use("/api/localidad", localidadRouter)
-
+app.use("/api/cliente",clienteRouter)
 
 dbConnection.connect((error) => {
     if (error) {
