@@ -168,7 +168,7 @@ router.get('/listar-cliente/:id',verifyToken, (req, res) => {
         res.status(500).json({ error: 'Error en el servidor' });
       } else {
         if (results.length === 0) {
-          res.status(404).json({ error: 'Perfil de usuario no encontrado' });
+          res.status(404).json({ error: 'No hay reservas' });
         } else {
           const perfilUsuario = results;
           res.json(perfilUsuario);
