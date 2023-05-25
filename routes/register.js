@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const { check, validationResult } = require('express-validator');
 const  Cliente  = require('../models/Clientes'); // Asumiendo que tienes un modelo llamado Cliente
 const nodemailer = require('nodemailer');
-
+const jwt = require('jsonwebtoken');
 // Ruta de registro
 router.post('/', [
   check('numDocumento').notEmpty().withMessage('El número de documento es requerido'),
@@ -69,6 +69,8 @@ router.post('/', [
         fechNac
       };
       const clienteId = await Cliente.create(clienteData);
+      const cliente = await Cliente.findOne({ email });
+      const token = jwt.sign({ clienteId: cliente.id }, process.env.JWT_SEC); // Generar el token JWT
       // Envío del correo electrónico
     var transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -102,7 +104,11 @@ router.post('/', [
         return res.status(500).json({ error: 'Error en el envío del correo electrónico' });
       } else {
         console.log('Email enviado');
-        return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.' });
+        return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
+        token: token,
+        codCliente: cliente.codCliente,
+        nombre: cliente.nombres 
+      });
       }
     });
   } catch (error) {
