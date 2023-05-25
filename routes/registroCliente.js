@@ -136,4 +136,45 @@ const validarFecha = (id, codLocalidad, fecha, horaInicial, horaFinal) => {
   });
 };
 
+//listar registro por usuario
+
+router.get('/listar-cliente/:id',verifyToken, (req, res) => {
+  const id = req.params.id;
+  const sql = `
+    SELECT
+      registro.codRegistro,
+      registro.fechRegistro,
+      registro.horainicio,
+      registro.horafinal,
+      registro.estado AS estadoRegistro,
+      registro.comentario,
+      registro.duracion,
+      cliente.nombres AS nomCliente,
+      registro.codCliente,
+      localidad.codLocalidad,
+      localidad.nomLocalidad,
+      registro.codUsuario,
+      registro.costoTarifa
+    FROM
+      registro
+      JOIN cliente ON registro.codCliente = cliente.codCliente
+      JOIN localidad ON registro.codLocalidad = localidad.codLocalidad
+    WHERE
+    registro.codCliente = ?`;
+
+    db.query(sql, [id], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error en el servidor' });
+      } else {
+        if (results.length === 0) {
+          res.status(404).json({ error: 'Perfil de usuario no encontrado' });
+        } else {
+          const perfilUsuario = results;
+          res.json(perfilUsuario);
+        }
+      }
+    });
+});
+
 module.exports = router;
