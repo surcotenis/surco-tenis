@@ -154,7 +154,11 @@ router.get('/listar-cliente/:id',verifyToken, (req, res) => {
       localidad.codLocalidad,
       localidad.nomLocalidad,
       registro.codUsuario,
-      registro.costoTarifa
+      registro.costoTarifa,
+      cliente.primer_apellido,
+      cliente.segundo_apellido,
+      cliente.telefono,
+      cliente.numDocumento
     FROM
       registro
       JOIN cliente ON registro.codCliente = cliente.codCliente
