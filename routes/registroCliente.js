@@ -91,7 +91,7 @@ router.post('/guardar',verifyToken, (req, res) => {
           horafinal: input.txtHoraFinal,
           duracion: input.txtTiempo,
           estado: 'SIN CONFIRMAR',
-          //pago: 0,
+          costoTarifa:input.costoTarifa,
           comentario: input.txtComentario
         };
 
@@ -160,6 +160,11 @@ router.get('/listar-cliente/:id',verifyToken, (req, res) => {
       localidad.codLocalidad,
       localidad.nomLocalidad,
       registro.codUsuario,
+      registro.costoTarifa,
+      cliente.primer_apellido,
+      cliente.segundo_apellido,
+      cliente.telefono,
+      cliente.numDocumento,
       registro.costoTarifa
     FROM
       registro
@@ -181,6 +186,65 @@ router.get('/listar-cliente/:id',verifyToken, (req, res) => {
         }
       }
     });
+});
+
+router.post('/precio', verifyToken, (req, res) => {
+  const { codCliente, codLocalidad, fechRegistro, horainicio, horafinal } = req.body;
+  const clienteQuery = `SELECT * FROM cliente WHERE codCliente = ${codCliente}`;
+  db.query(clienteQuery, (error, results) => {
+    if (error) {
+      console.error('Error al consultar la tabla "cliente": ', error);
+      res.status(500).json({ error: 'Error en el servidor' });
+      return;
+    }
+
+    if (results.length === 0) {
+      res.status(400).json({ error: 'Usuario no encontrado' });
+      return;
+    }
+
+    const cliente = results[0];
+    const tipoCliente = cliente.tipo;
+    const hora = horainicio;
+
+    let precioQuery;
+    switch (tipoCliente) {
+      case 'CLIENTE':
+        // Validar si es en la mañana o en la tarde
+        if (hora >= "06:00:00" && hora < "12:00:00") {
+          precioQuery = `SELECT precioDia FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else if (hora >= "12:00:00" && hora < "22:00:00") {
+          precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else {
+          res.status(400).json({ error: 'Horario no válido' });
+          return;
+        }
+        break;
+
+      // Agrega más casos para otros tipos de clientes si es necesario
+
+      default:
+        res.status(400).json({ error: 'Tipo de cliente no válido' });
+        return;
+    }
+
+    // Realizar la consulta de precio correspondiente
+    db.query(precioQuery, (err, result) => {
+      if (err) {
+        console.error('Error al consultar la tabla "localidad": ', err);
+        res.status(500).json({ error: 'Error en el servidor' });
+        return;
+      }
+
+      if (result.length === 0) {
+        res.status(400).json({ error: 'Localidad no encontrada' });
+        return;
+      }
+
+      const precio = result[0].precioDia || result[0].precioNoche;
+      res.json({ precio });
+    });
+  });
 });
 
 module.exports = router;

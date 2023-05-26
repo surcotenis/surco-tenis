@@ -37,7 +37,8 @@ router.post('/login', [
     return res.status(200).json({ 
       token:token,
       codCliente:cliente.codCliente,
-      nombre:cliente.nombres
+      nombre:cliente.nombres,
+      tipo:cliente.tipo
      });
   } catch (error) {
     console.error(error);
