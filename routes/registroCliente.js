@@ -5,8 +5,8 @@ const moment = require('moment');
 const {verifyToken, verifyTokenAndAuthorization} =require("./verifyToken")
 
 router.get('/listar/', (req, res) => {
-  const id = req.query.id;
-  const sql = `
+  const idFilter = req.query.id;
+  let sql = `
     SELECT
       registro.codRegistro,
       registro.fechRegistro,
@@ -23,11 +23,16 @@ router.get('/listar/', (req, res) => {
     FROM
       registro
       JOIN cliente ON registro.codCliente = cliente.codCliente
-      JOIN localidad ON registro.codLocalidad = localidad.codLocalidad
-    WHERE
-      registro.codLocalidad = ?`;
+      JOIN localidad ON registro.codLocalidad = localidad.codLocalidad`;
 
-  db.query(sql, [id], (error, rows) => {
+  let params = [];
+
+  if (idFilter) {
+    sql += " WHERE registro.codLocalidad = ?";
+    params.push(idFilter);
+  }
+
+  db.query(sql, params, (error, rows) => {
     if (error) {
       console.error(error);
       res.status(500).json({ error: 'Error en el servidor' });
@@ -55,6 +60,7 @@ router.get('/listar/', (req, res) => {
     }
   });
 });
+
 
 // Ruta para guardar el registro
 router.post('/guardar',verifyToken, (req, res) => {
