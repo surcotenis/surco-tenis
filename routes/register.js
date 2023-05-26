@@ -107,7 +107,8 @@ router.post('/', [
         return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
         token: token,
         codCliente: cliente.codCliente,
-        nombre: cliente.nombres 
+        nombre: cliente.nombres,
+        tipo:cliente.tipo
       });
       }
     });
