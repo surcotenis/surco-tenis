@@ -85,7 +85,7 @@ router.post('/guardar',verifyToken, (req, res) => {
           horafinal: input.txtHoraFinal,
           duracion: input.txtTiempo,
           estado: 'SIN CONFIRMAR',
-          //pago: 0,
+          costoTarifa:input.costoTarifa,
           comentario: input.txtComentario
         };
 
