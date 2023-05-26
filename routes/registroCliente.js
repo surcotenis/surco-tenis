@@ -158,7 +158,8 @@ router.get('/listar-cliente/:id',verifyToken, (req, res) => {
       cliente.primer_apellido,
       cliente.segundo_apellido,
       cliente.telefono,
-      cliente.numDocumento
+      cliente.numDocumento,
+      registro.costoTarifa
     FROM
       registro
       JOIN cliente ON registro.codCliente = cliente.codCliente
