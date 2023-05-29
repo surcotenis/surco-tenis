@@ -41,7 +41,7 @@ router.get('/listar/', (req, res) => {
         id: value.codRegistro,
         start: `${value.fechRegistro} ${value.horainicio}`,
         end: `${value.fechRegistro} ${value.horafinal}`,
-        title: `${value.estadoRegistro} - ${value.nomCliente}`,
+        //title: `${value.estadoRegistro} - ${value.nomCliente}`,
         backgroundColor: value.estadoRegistro === 'SIN CONFIRMAR' ? '#F86569' : '#20c997',
         textColor: '#fff',
         extendedProps: {
@@ -164,14 +164,16 @@ router.get('/listar-cliente/:id',verifyToken, (req, res) => {
       cliente.primer_apellido,
       cliente.segundo_apellido,
       cliente.telefono,
-      cliente.numDocumento,
-      registro.costoTarifa
+      cliente.numDocumento
     FROM
       registro
       JOIN cliente ON registro.codCliente = cliente.codCliente
       JOIN localidad ON registro.codLocalidad = localidad.codLocalidad
     WHERE
-    registro.codCliente = ?`;
+    registro.codCliente = ?
+    ORDER BY
+      registro.fechRegistro DESC,
+      registro.horainicio DESC`;
 
     db.query(sql, [id], (error, results) => {
       if (error) {
