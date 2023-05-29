@@ -18,10 +18,10 @@
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.0",
-    "mysql": "^2.18.1",
     "nodemailer": "^6.9.2",
     "nodemon": "^2.0.22",
     "sequelize": "^6.31.1",
-    "util": "^0.12.5"
+    "util": "^0.12.5",
+    "mysql": "^2.18.1"
   }
 }
