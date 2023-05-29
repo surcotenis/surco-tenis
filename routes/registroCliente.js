@@ -61,7 +61,6 @@ router.get('/listar/', (req, res) => {
   });
 });
 
-
 // Ruta para guardar el registro
 router.post('/guardar',verifyToken, (req, res) => {
   const input = req.body;
