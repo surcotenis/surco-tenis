@@ -25,12 +25,12 @@ app.use("/api/localidad", localidadRouter)
 app.use("/api/cliente",clienteRouter)
 
 dbConnection.connect((error) => {
-    if (error) {
-      console.error('Error connecting to database: ', error);
-    } else {
-      console.log('Successful connection to the database.');
+   // if (error) {
+   //   console.error('Error connecting to database: ', error);
+   // } else {
+      //console.log('Successful connection to the database.');
       app.listen(port, () => {
         console.log("API Server of tennis running");
       });
-    }
+   // }
   });
