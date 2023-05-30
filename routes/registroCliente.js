@@ -210,25 +210,38 @@ router.post('/precio', verifyToken, (req, res) => {
     const hora = horainicio;
 
     let precioQuery;
-    switch (tipoCliente) {
-      case 'CLIENTE':
-        // Validar si es en la mañana o en la tarde
-        if (hora >= "06:00:00" && hora < "12:00:00") {
-          precioQuery = `SELECT precioDia FROM localidad WHERE codLocalidad = ${codLocalidad}`;
-        } else if (hora >= "12:00:00" && hora < "22:00:00") {
-          precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
-        } else {
-          res.status(400).json({ error: 'Horario no válido' });
-          return;
-        }
-        break;
-
-      // Agrega más casos para otros tipos de clientes si es necesario
-
-      default:
-        res.status(400).json({ error: 'Tipo de cliente no válido' });
+    let casoValido = true;
+      switch (tipoCliente) {
+        case 'CLIENTE':
+          // Validar si es en la mañana o en la tarde
+          if (hora >= "06:00:00" && hora < "12:00:00") {
+            precioQuery = `SELECT precioDia FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+          } else if (hora >= "12:00:00" && hora < "22:00:00") {
+            precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+          } else {
+            casoValido = false;
+          }
+          break;
+        case 'MAYOR':
+          precioQuery = `SELECT precioAdultosMayor FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+          break;
+        case 'MENOR':
+          precioQuery = `SELECT precioMenores FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+          break;
+        case 'VECINO_SI':
+          precioQuery = `SELECT precioVecinosSI FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+          break;
+        case 'VECINO_VSP':
+          precioQuery = `SELECT precioVecinosVSP FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+          break;
+        default:
+          casoValido = false;
+      }
+      
+      if (!casoValido) {
+        res.status(400).json({ error: 'Tipo de cliente o horario no válido' });
         return;
-    }
+      }
 
     // Realizar la consulta de precio correspondiente
     db.query(precioQuery, (err, result) => {
@@ -243,7 +256,7 @@ router.post('/precio', verifyToken, (req, res) => {
         return;
       }
 
-      const precio = result[0].precioDia || result[0].precioNoche;
+      const precio = result[0].precioDia || result[0].precioNoche || result[0].precioAdultosMayor || result[0].precioMenores || result[0].precioVecinosSI || result[0].precioVecinosVSP;
       res.json({ precio });
     });
   });
