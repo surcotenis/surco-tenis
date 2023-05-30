@@ -56,7 +56,7 @@ router.post('/', [
         nombres,
         email,
         telefono,
-        password: await bcrypt.hash(password, 0),
+        password: await bcrypt.hash(password, 10),
         estado: 'ACTIVO',
         tipo: 'CLIENTE',
         creacion: new Date().toISOString(),
