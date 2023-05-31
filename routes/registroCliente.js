@@ -214,9 +214,9 @@ router.post('/precio', verifyToken, (req, res) => {
       switch (tipoCliente) {
         case 'CLIENTE':
           // Validar si es en la mañana o en la tarde
-          if (hora >= "06:00:00" && hora < "16:00:00") {
+          if (hora >= "06:00:00" && hora < "18:00:00") {
             precioQuery = `SELECT precioDia FROM localidad WHERE codLocalidad = ${codLocalidad}`;
-          } else if (hora >= "16:00:00" && hora < "22:00:00") {
+          } else if (hora >= "18:00:00" && hora < "22:00:00") {
             precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
           } else {
             casoValido = false;
