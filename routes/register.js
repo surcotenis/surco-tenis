@@ -11,13 +11,13 @@ router.post('/', [
   check('nombres').notEmpty().withMessage('El nombre es requerido'),
   check('email').notEmpty().withMessage('El correo electrónico es requerido').isEmail().withMessage('El correo electrónico no es válido'),
   check('telefono').notEmpty().withMessage('El número de teléfono es requerido'),
-  check('password').notEmpty().withMessage('La contraseña es requerida').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+  check('password').notEmpty().withMessage('La contraseña es requerida').isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
   check('passwordConfirmation').notEmpty().withMessage('La confirmación de contraseña es requerida').custom((value, { req }) => value === req.body.password).withMessage('La confirmación de contraseña no coincide'),
   check('tipo_documento').notEmpty().withMessage('El tipo de documento es requerido'),
   check('primer_apellido').notEmpty().withMessage('El primer apellido es requerido'),
   check('segundo_apellido').notEmpty().withMessage('El segundo apellido es requerido'),
-  check('nivel').notEmpty().withMessage('El nivel es requerido'),
-  check('posicion').notEmpty().withMessage('El nivel es requerido'),
+  //check('nivel').notEmpty().withMessage('El nivel es requerido'),
+  //check('posicion').notEmpty().withMessage('El nivel es requerido'),
   check('genero').notEmpty().withMessage('El nivel es requerido'),
   check('fechNac').notEmpty().withMessage('El fecha de nacimiento es requerido'),
 
@@ -38,8 +38,8 @@ router.post('/', [
             tipo_documento,
             primer_apellido,
             segundo_apellido,
-            nivel,
-            posicion,
+            //nivel,
+            //posicion,
             genero,
             fechNac
           } = req.body;
@@ -63,8 +63,8 @@ router.post('/', [
         tipo_documento,
         primer_apellido,
         segundo_apellido,
-        nivel,
-        posicion,
+        //nivel,
+        //posicion,
         genero,
         fechNac
       };
