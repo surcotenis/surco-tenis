@@ -86,16 +86,65 @@ router.post('/', [
       to: email, // Utilizamos el correo del usuario registrado como destinatario
       subject: 'Registro exitoso',
       html: `
-    <h1>¡Gracias por registrarte en nuestro sitio web!</h1>
-    <p>Bienvenido/a ${nombres}!</p>
-    <p>Tu cuenta ha sido registrada exitosamente.</p>
-    <p>Para comenzar a utilizar nuestros servicios, por favor verifica tu cuenta siguiendo las instrucciones a continuación:</p>
-    <ol>
-      <li>Ingresa a nuestro sitio web <a href="https://surcotenis.pe/">surcotenis.pe</a></li>
-    </ol>
-    <p>Gracias nuevamente por unirte a nosotros. ¡Esperamos que disfrutes de tu experiencia en nuestro sitio web!</p>
-    <p>Saludos,</p>
-    <p>El equipo surcotenis</p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Correo de bienvenida</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #000;
+            margin: 0;
+            padding: 0;
+          }
+      
+          .container {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+      
+          h1 {
+            font-size: 24px;
+            color: #006F57;
+          }
+      
+          p {
+            font-size: 16px;
+            margin-bottom: 10px;
+          }
+      
+          a {
+            color: #BCCD1E;
+            text-decoration: none;
+          }
+      
+          img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>¡Gracias por registrarte en Surco Tenis!</h1>
+          <p>Bienvenido/a ${nombres}!</p>
+          <p>Tu cuenta ha sido registrada exitosamente.</p>
+          <p>Para comenzar a utilizar nuestros servicios, por favor verifica tu cuenta siguiendo las instrucciones a continuación:</p>
+          <p>Ingresa a nuestro sitio web <a href="https://reservas.surcotenis.pe/">reservas.surcotenis.pe</a></p>
+          <p>Utiliza las siguientes credenciales para iniciar sesión:</p>
+          <p>Correo electrónico: ${email}</p>
+          <p>Contraseña: ${password}</p>
+          <p>Gracias nuevamente por unirte a nosotros. ¡Esperamos que disfrutes de tu experiencia en nuestro sitio web!</p>
+          <p>Saludos,</p>
+          <p>El equipo de Surco Tenis</p>
+          <img src="https://surcotenis.pe/wp-content/uploads/2023/05/logo-300x140.png" alt="Descripción de la imagen">
+        </div>
+      </body>
+      </html>      
   `,
     };
     transporter.sendMail(mailOptions, (error, info) => {
@@ -103,7 +152,6 @@ router.post('/', [
         console.error(error);
         return res.status(500).json({ error: 'Error en el envío del correo electrónico' });
       } else {
-        console.log('Email enviado');
         return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
         token: token,
         codCliente: cliente.codCliente,

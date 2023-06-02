@@ -60,7 +60,6 @@ const Cliente = {
       const connection = await dbConnection();
       const query = 'SELECT * FROM cliente WHERE ?';
       const [results] = await connection.query(query, conditions);
-      console.log(results)
       connection.release();
       if (results.length > 0) {
         return results[0];

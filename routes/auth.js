@@ -78,10 +78,6 @@ router.post('/login', [
     if (!cliente) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
-
-    console.log('Valor de "password":', password);
-console.log('Valor de "cliente.password":', cliente.password);
-
     // Verificar la contraseña
     const isPasswordValid = await bcrypt.compare(password, cliente.password);
     if (!isPasswordValid) {
