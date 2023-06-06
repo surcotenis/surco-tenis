@@ -82,7 +82,7 @@ router.post('/', [
       },
     });
     var mailOptions = {
-      from: 'noreply@surcotenis.pe' , //'systemdevsperu@gmail.com',
+      from: 'systemdevsperu@gmail.com',
       to: email, // Utilizamos el correo del usuario registrado como destinatario
       subject: 'Registro exitoso',
       html: `
