@@ -20,6 +20,7 @@ router.post('/', [
   //check('posicion').notEmpty().withMessage('El nivel es requerido'),
   check('genero').notEmpty().withMessage('El nivel es requerido'),
   check('fechNac').notEmpty().withMessage('El fecha de nacimiento es requerido'),
+  check('tipo').notEmpty().withMessage('El tipo de cliente es requerido'),
 
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -41,7 +42,8 @@ router.post('/', [
             //nivel,
             //posicion,
             genero,
-            fechNac
+            fechNac,
+            tipo
           } = req.body;
 
     // Verificar si el cliente ya está registrado
@@ -66,7 +68,8 @@ router.post('/', [
         //nivel,
         //posicion,
         genero,
-        fechNac
+        fechNac,
+        tipo
       };
       const clienteId = await Cliente.create(clienteData);
       const cliente = await Cliente.findOne({ email });
@@ -77,12 +80,12 @@ router.post('/', [
       port: 465,
       secure: true,
       auth: {
-        user: 'systemdevsperu@gmail.com',
-        pass: 'bnsbburpfymjxqar',
+        user: 'joseyzambranovpe@gmail.com',
+        pass: 'aurltesroxirpwnp',
       },
     });
     var mailOptions = {
-      from: 'systemdevsperu@gmail.com',
+      from: 'joseyzambranovpe@gmail.com',
       to: email, // Utilizamos el correo del usuario registrado como destinatario
       subject: 'Registro exitoso',
       html: `
@@ -147,31 +150,31 @@ router.post('/', [
       </html>      
   `,
     };
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Error en el envío del correo electrónico' });
-      } else {
-        return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
+
+
+    //transporter.sendMail(mailOptions, (error, info) => {
+    //  if (error) {
+    //    console.error(error);
+    //    return res.status(500).json({ error: 'Error en el envío del correo electrónico' });
+    //  } else {
+    //    return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
+    //    token: token,
+    //    codCliente: cliente.codCliente,
+    //    nombre: cliente.nombres,
+    //    tipo:cliente.tipo
+    //  });
+    //  }
+    //});
+    return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
         token: token,
         codCliente: cliente.codCliente,
         nombre: cliente.nombres,
-        tipo:cliente.tipo
-      });
-      }
-    });
+        tipo:cliente.tipo})
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error en el registro' });
   }
 });
-
-//    return res.status(200).json({ success: 'Registrado exitosamente' });
-//  } catch (error) {
-//    console.error(error);
-//    return res.status(500).json({ error: 'Error en el registro' });
-//  }
-//});
 
 module.exports = router;
 
