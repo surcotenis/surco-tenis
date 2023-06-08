@@ -633,7 +633,12 @@ router.post('/validar-fecha-reserva', async (req, res) => {
 router.get('/registro/:id', async (req, res) => {
   try {
     const registroId = req.params.id;
-    const registroQuery = 'SELECT * FROM registro WHERE codRegistro = ?';
+    const registroQuery = 
+    `SELECT codRegistro,codUsuario,registro.codCliente,fechRegistro ,horainicio,horafinal,tarifa, costoTarifa,cliente.nombres , cliente.primer_apellido , cliente.segundo_apellido, localidad.nomLocalidad , cliente.direccion,cliente.numDocumento,cliente.tipo
+    FROM registro
+    INNER JOIN cliente ON cliente.codCliente = registro.codCliente
+    INNER JOIN localidad ON localidad.codLocalidad= registro.codLocalidad
+    WHERE codRegistro = ?`
 
     const connection = await dbConnection();
     const [registroResults] = await connection.query(registroQuery, [registroId]);
