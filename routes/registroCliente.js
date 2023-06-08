@@ -437,6 +437,7 @@ router.post('/precio', verifyToken, (req, res) => {
   });
 });
 */
+/*
 router.post('/precio', verifyToken, async (req, res) => {
   try {
     const { codCliente, codLocalidad, fechRegistro, horainicio, horafinal } = req.body;
@@ -470,16 +471,44 @@ router.post('/precio', verifyToken, async (req, res) => {
         }
         break;
       case 'MAYOR':
-        precioQuery = `SELECT precioAdultosMayor FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        //precioQuery = `SELECT precioAdultosMayor FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        if (hora >= "06:00:00" && hora < "18:00:00") {
+          precioQuery = `SELECT precioAdultosMayor FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else if (hora >= "18:00:00" && hora < "22:00:00") {
+          precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else {
+          casoValido = false;
+        }
         break;
       case 'MENOR':
-        precioQuery = `SELECT precioMenores FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        //precioQuery = `SELECT precioMenores FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        if (hora >= "06:00:00" && hora < "18:00:00") {
+          precioQuery = `SELECT precioMenores FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else if (hora >= "18:00:00" && hora < "22:00:00") {
+          precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else {
+          casoValido = false;
+        }
         break;
       case 'VECINO_SI':
+       // precioQuery = `SELECT precioVecinosSI FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+       if (hora >= "06:00:00" && hora < "18:00:00") {
         precioQuery = `SELECT precioVecinosSI FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+      } else if (hora >= "18:00:00" && hora < "22:00:00") {
+        precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+      } else {
+        casoValido = false;
+      }
         break;
       case 'VECINO_VSP':
-        precioQuery = `SELECT precioVecinosVSP FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        //precioQuery = `SELECT precioVecinosVSP FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        if (hora >= "06:00:00" && hora < "18:00:00") {
+          precioQuery = `SELECT precioVecinosVSP FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else if (hora >= "18:00:00" && hora < "22:00:00") {
+          precioQuery = `SELECT precioNoche FROM localidad WHERE codLocalidad = ${codLocalidad}`;
+        } else {
+          casoValido = false;
+        }
         break;
       default:
         casoValido = false;
@@ -507,6 +536,72 @@ router.post('/precio', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+*/
+router.post('/precio', verifyToken, async (req, res) => {
+  try {
+    const { codCliente, codLocalidad, fechRegistro, horainicio, horafinal } = req.body;
+    const clienteQuery = 'SELECT * FROM cliente WHERE codCliente = ?';
+    const precioQueries = {
+      CLIENTE: {
+        '06:00:00-18:00:00': 'SELECT precioDia FROM localidad WHERE codLocalidad = ?',
+        '18:00:00-22:00:00': 'SELECT precioNoche FROM localidad WHERE codLocalidad = ?'
+      },
+      MAYOR: {
+        '06:00:00-18:00:00': 'SELECT precioAdultosMayor FROM localidad WHERE codLocalidad = ?',
+        '18:00:00-22:00:00': 'SELECT precioNoche FROM localidad WHERE codLocalidad = ?'
+      },
+      MENOR: {
+        '06:00:00-18:00:00': 'SELECT precioMenores FROM localidad WHERE codLocalidad = ?',
+        '18:00:00-22:00:00': 'SELECT precioNoche FROM localidad WHERE codLocalidad = ?'
+      },
+      VECINO_SI: {
+        '06:00:00-18:00:00': 'SELECT precioVecinosSI FROM localidad WHERE codLocalidad = ?',
+        '18:00:00-22:00:00': 'SELECT precioNoche FROM localidad WHERE codLocalidad = ?'
+      },
+      VECINO_VSP: {
+        '06:00:00-18:00:00': 'SELECT precioVecinosVSP FROM localidad WHERE codLocalidad = ?',
+        '18:00:00-22:00:00': 'SELECT precioNoche FROM localidad WHERE codLocalidad = ?'
+      }
+    };
+
+    const connection = await dbConnection();
+
+    const [clienteResults] = await connection.query(clienteQuery, [codCliente]);
+
+    if (clienteResults.length === 0) {
+      res.status(400).json({ error: 'Usuario no encontrado' });
+      return;
+    }
+
+    const cliente = clienteResults[0];
+    const tipoCliente = cliente.tipo;
+    const hora = horainicio;
+
+    const horaKey = (hora >= '06:00:00' && hora < '18:00:00') ? '06:00:00-18:00:00' : '18:00:00-22:00:00';
+    const precioQuery = precioQueries[tipoCliente][horaKey];
+
+    if (!precioQuery) {
+      res.status(400).json({ error: 'Tipo de cliente o horario no válido' });
+      return;
+    }
+
+    const [precioResults] = await connection.query(precioQuery, [codLocalidad]);
+
+    if (precioResults.length === 0) {
+      res.status(400).json({ error: 'Localidad no encontrada' });
+      return;
+    }
+
+    const precio = precioResults[0].precioDia || precioResults[0].precioNoche || precioResults[0].precioAdultosMayor || precioResults[0].precioMenores || precioResults[0].precioVecinosSI || precioResults[0].precioVecinosVSP;
+    res.json({ precio });
+
+    connection.release();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 
 router.post('/validar-fecha-reserva', async (req, res) => {
   try {
@@ -535,5 +630,31 @@ router.post('/validar-fecha-reserva', async (req, res) => {
   }
 });
 
+router.get('/registro/:id', async (req, res) => {
+  try {
+    const registroId = req.params.id;
+    const registroQuery = 'SELECT * FROM registro WHERE codRegistro = ?';
+
+    const connection = await dbConnection();
+    const [registroResults] = await connection.query(registroQuery, [registroId]);
+
+    if (registroResults.length === 0) {
+      return res.status(404).json({ error: 'Pedido no encontrado' });
+    }
+
+    const pedido = registroResults[0];
+    
+    const resultado = {
+     pedido
+    };
+
+    res.json(resultado);
+
+    connection.release();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
 
 module.exports = router;
