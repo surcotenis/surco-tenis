@@ -149,6 +149,7 @@ router.post('/guardar', verifyToken, async (req, res) => {
   }
 });
 */
+/*
 router.post('/guardar', verifyToken, async (req, res) => {
   try {
     const connection = await dbConnection(); // Obtén la conexión a la base de datos
@@ -183,6 +184,65 @@ router.post('/guardar', verifyToken, async (req, res) => {
         const [results] = await connection.query('INSERT INTO registro SET ?', registro); // Ejecuta la inserción utilizando la conexión
 
         res.json({ ok: true });
+      }
+    } else {
+      res.json({ ok: false });
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en la base de datos' });
+  }
+});
+*/
+router.post('/guardar', verifyToken, async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const input = req.body;
+
+    if (validarFecha(-1, input.ddlLocalidad, input.txtFecha, input.txtHoraInicial, input.txtHoraFinal)) {
+      // Verificar si hay una campaña que comienza en la misma hora
+      const [existingCampaigns] = await connection.query(
+        'SELECT * FROM registro WHERE horainicio = ? AND codLocalidad = ? AND fechRegistro = ?',
+        [input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+      );
+
+      if (existingCampaigns.length > 0) {
+        // Si hay una campaña que comienza en la misma hora y localidad, devolver una respuesta indicando que no se puede registrar la reserva
+        res.json({ ok: false, message: 'Ya hay una campaña que comienza en la misma hora y localidad.' });
+      } else {
+        // Verificar si el cliente tiene 2 o más registros en el mismo día
+        const [existingRecords] = await connection.query(
+          'SELECT COUNT(*) AS recordCount FROM registro WHERE codCliente = ? AND fechRegistro = ?',
+          [input.ddlClientes, input.txtFecha]
+        );
+
+        const { recordCount } = existingRecords[0];
+
+        if (recordCount >= 2) {
+          // Si el cliente ya tiene 2 o más registros en el mismo día, devolver una respuesta indicando que no se puede registrar más
+          res.json({ ok: false, message: 'El cliente ya tiene 2 o más registros en el mismo día.' });
+        } else {
+          // Si no hay campañas que cumplan con los criterios y el cliente no tiene 2 o más registros en el mismo día, insertar la reserva
+          const registro = {
+            codUsuario: 1, // Aquí puedes cambiarlo para obtener el código del usuario autenticado usando JWT
+            codCliente: input.ddlClientes,
+            codLocalidad: input.ddlLocalidad,
+            // codCaja: caja.codCaja,
+            fechRegistro: input.txtFecha,
+            horainicio: input.txtHoraInicial,
+            horafinal: input.txtHoraFinal,
+            duracion: input.txtTiempo,
+            estado: 'SIN CONFIRMAR',
+            costoTarifa: input.costoTarifa,
+            comentario: input.txtComentario
+          };
+
+          const [results] = await connection.query('INSERT INTO registro SET ?', registro); // Ejecuta la inserción utilizando la conexión
+
+          res.json({ ok: true });
+        }
       }
     } else {
       res.json({ ok: false });
@@ -656,6 +716,34 @@ router.get('/registro/:id', async (req, res) => {
     res.json(resultado);
 
     connection.release();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+router.post('/validar-cantidad-reserva', async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const input = req.body;
+
+    // Verificar si hay una campaña que comienza en la misma hora y localidad
+    const [existingRecords] = await connection.query(
+      'SELECT COUNT(*) AS recordCount FROM registro WHERE codCliente = ? AND fechRegistro = ?',
+      [input.ddlClientes, input.txtFecha]
+    );
+
+    const { recordCount } = existingRecords[0];
+
+    if (recordCount >= 2) {
+      // Si el cliente ya tiene 2 o más registros en el mismo día, devolver una respuesta indicando que no se puede registrar más
+      res.status(400).json({ error: 'El cliente ya tiene 2 o más registros en el mismo día.' });
+    }  else {
+      // Si no hay campañas que cumplan con los criterios, la reserva es válida
+      res.json({ ok: true });
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error en el servidor' });
