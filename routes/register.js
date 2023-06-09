@@ -80,12 +80,12 @@ router.post('/', [
       port: 465,
       secure: true,
       auth: {
-        user: 'joseyzambranovpe@gmail.com',
-        pass: 'aurltesroxirpwnp',
+        user: 'systemdevsperu@gmail.com',
+        pass: 'jwgnmcwgimptuirf',
       },
     });
     var mailOptions = {
-      from: 'joseyzambranovpe@gmail.com',
+      from: 'systemdevsperu@gmail.com',
       to: email, // Utilizamos el correo del usuario registrado como destinatario
       subject: 'Registro exitoso',
       html: `
@@ -152,24 +152,24 @@ router.post('/', [
     };
 
 
-    //transporter.sendMail(mailOptions, (error, info) => {
-    //  if (error) {
-    //    console.error(error);
-    //    return res.status(500).json({ error: 'Error en el envío del correo electrónico' });
-    //  } else {
-    //    return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
-    //    token: token,
-    //    codCliente: cliente.codCliente,
-    //    nombre: cliente.nombres,
-    //    tipo:cliente.tipo
-    //  });
-    //  }
-    //});
-    return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error en el envío del correo electrónico' });
+      } else {
+        return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
         token: token,
         codCliente: cliente.codCliente,
         nombre: cliente.nombres,
-        tipo:cliente.tipo})
+        tipo:cliente.tipo
+      });
+      }
+    });
+    //return res.status(200).json({ success: 'Registrado exitosamente. Se ha enviado un correo electrónico de confirmación.',
+    //    token: token,
+    //    codCliente: cliente.codCliente,
+    //    nombre: cliente.nombres,
+    //    tipo:cliente.tipo})
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Error en el registro' });
