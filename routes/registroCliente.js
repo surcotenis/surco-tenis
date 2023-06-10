@@ -204,8 +204,8 @@ router.post('/guardar', verifyToken, async (req, res) => {
     if (validarFecha(-1, input.ddlLocalidad, input.txtFecha, input.txtHoraInicial, input.txtHoraFinal)) {
       // Verificar si hay una campaña que comienza en la misma hora
       const [existingCampaigns] = await connection.query(
-        'SELECT * FROM registro WHERE horainicio = ? AND codLocalidad = ? AND fechRegistro = ?',
-        [input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+        'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
+      [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
       );
 
       if (existingCampaigns.length > 0) {
@@ -662,7 +662,7 @@ router.post('/precio', verifyToken, async (req, res) => {
   }
 });
 
-
+/*
 router.post('/validar-fecha-reserva', async (req, res) => {
   try {
     const connection = await dbConnection(); // Obtén la conexión a la base de datos
@@ -689,7 +689,7 @@ router.post('/validar-fecha-reserva', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
-
+*/
 router.get('/registro/:id', async (req, res) => {
   try {
     const registroId = req.params.id;
@@ -802,6 +802,33 @@ router.delete('/eliminar/:id', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Error en la base de datos' });
   }
 });
+
+router.post('/validar-fecha-reserva', async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const input = req.body;
+
+    // Verificar si hay una campaña que comienza o termina dentro del rango de tiempo de la reserva
+    const [existingCampaigns] = await connection.query(
+      'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
+      [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+    );
+
+    if (existingCampaigns.length > 0) {
+      // Si hay una campaña que cumple con los criterios, devolver una respuesta indicando que no se puede registrar la reserva
+      res.status(400).json({ error: 'Ya hay una campaña que se superpone en el tiempo asignado.' });
+    } else {
+      // Si no hay campañas que cumplan con los criterios, la reserva es válida
+      res.json({ ok: true });
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 
 
 module.exports = router;
