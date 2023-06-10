@@ -240,8 +240,8 @@ router.post('/guardar', verifyToken, async (req, res) => {
           };
 
           const [results] = await connection.query('INSERT INTO registro SET ?', registro); // Ejecuta la inserción utilizando la conexión
-
-          res.json({ ok: true });
+          const insertId = results.insertId;
+          res.json({ ok: true , codRegistro:insertId});
         }
       }
     } else {
@@ -749,5 +749,59 @@ router.post('/validar-cantidad-reserva', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
+router.put('/confirmar/:id', verifyToken, async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const id = req.params.id; // Obtén el ID de la campaña de los parámetros de la solicitud
+
+    // Actualiza el estado de la campaña a "CONFIRMADO"
+    const [result] = await connection.query('UPDATE registro SET estado = ? WHERE codRegistro = ?', ['CONFIRMADO', id]);
+
+    if (result.affectedRows === 0) {
+      // Si no se encuentra la campaña con el ID proporcionado, devuelve una respuesta indicando que no se pudo actualizar
+      res.json({ ok: false, message: 'No se encontró la campaña para actualizar el estado.' });
+    } else {
+      // Si se actualiza correctamente, devuelve una respuesta indicando que se actualizó el estado
+      res.json({ ok: true, message: 'Estado actualizado correctamente.' });
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en la base de datos' });
+  }
+});
+router.delete('/eliminar/:id', verifyToken, async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const id = req.params.id; // Obtén el ID del registro de los parámetros de la solicitud
+
+    // Verificar si el registro existe y su estado es "SIN CONFIRMAR"
+    const [existingRecord] = await connection.query('SELECT * FROM registro WHERE codRegistro = ? AND estado = ?', [id, 'SIN CONFIRMAR']);
+
+    if (existingRecord.length === 0) {
+      // Si no se encuentra el registro con el ID y estado correspondiente, devuelve una respuesta indicando que no se puede eliminar
+      res.json({ ok: false, message: 'No se encontró el registro para eliminar o su estado no es SIN CONFIRMAR.' });
+    } else {
+      // Si se cumple la condición, elimina el registro
+      const [result] = await connection.query('DELETE FROM registro WHERE codRegistro = ?', [id]);
+
+      if (result.affectedRows === 0) {
+        // Si no se elimina ninguna fila, devuelve una respuesta de error
+        res.json({ ok: false, message: 'No se pudo eliminar el registro.' });
+      } else {
+        // Si se elimina correctamente, devuelve una respuesta exitosa
+        res.json({ ok: true, message: 'Registro eliminado correctamente.' });
+      }
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en la base de datos' });
+  }
+});
+
 
 module.exports = router;
