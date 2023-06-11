@@ -210,7 +210,8 @@ router.post('/guardar', verifyToken, async (req, res) => {
 
       if (existingCampaigns.length > 0) {
         // Si hay una campaña que comienza en la misma hora y localidad, devolver una respuesta indicando que no se puede registrar la reserva
-        res.json({ ok: false, message: 'Ya hay una campaña que comienza en la misma hora y localidad.' });
+       // res.json({ ok: false, message: 'Ya hay una campaña que comienza en la misma hora y localidad.' });
+        res.status(400).json({ error: 'Ya hay una campaña que comienza en la misma hora y localidad.' });
       } else {
         // Verificar si el cliente tiene 2 o más registros en el mismo día
         const [existingRecords] = await connection.query(
@@ -222,7 +223,8 @@ router.post('/guardar', verifyToken, async (req, res) => {
 
         if (recordCount >= 2) {
           // Si el cliente ya tiene 2 o más registros en el mismo día, devolver una respuesta indicando que no se puede registrar más
-          res.json({ ok: false, message: 'El cliente ya tiene 2 o más registros en el mismo día.' });
+          //res.json({ ok: false, message: 'El cliente ya tiene 2 o más registros en el mismo día.' });
+          res.status(400).json({ error: 'El cliente ya tiene 2 o más registros en el mismo día.' });
         } else {
           // Si no hay campañas que cumplan con los criterios y el cliente no tiene 2 o más registros en el mismo día, insertar la reserva
           const registro = {
@@ -245,7 +247,7 @@ router.post('/guardar', verifyToken, async (req, res) => {
         }
       }
     } else {
-      res.json({ ok: false });
+      res.status(400).json({ error: 'no pasa la validacion de fecha' });
     }
 
     connection.release(); // Libera la conexión del pool cuando hayas terminado
