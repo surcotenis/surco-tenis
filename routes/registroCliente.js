@@ -41,7 +41,7 @@ router.get('/listar/', async (req, res) => {
       start: `${value.fechRegistro} ${value.horainicio}`,
       end: `${value.fechRegistro} ${value.horafinal}`,
       //title: `${value.estadoRegistro} - ${value.nomCliente}`,
-      backgroundColor: value.estadoRegistro === 'SIN CONFIRMAR' ? '#F86569' : '#20c997',
+      backgroundColor: value.estadoRegistro === 'SIN CONFIRMAR' ? '#F86569' : '#F86569',
       textColor: '#fff',
       extendedProps: {
         codRegistro: value.codRegistro,
@@ -236,7 +236,7 @@ router.post('/guardar', verifyToken, async (req, res) => {
             horainicio: input.txtHoraInicial,
             horafinal: input.txtHoraFinal,
             duracion: input.txtTiempo,
-            estado: 'SIN CONFIRMAR',
+            estado: 'CONFIRMADO',
             costoTarifa: input.costoTarifa,
             comentario: input.txtComentario
           };
@@ -813,7 +813,7 @@ router.delete('/eliminar/:id', verifyToken, async (req, res) => {
     const id = req.params.id; // Obtén el ID del registro de los parámetros de la solicitud
 
     // Verificar si el registro existe y su estado es "SIN CONFIRMAR"
-    const [existingRecord] = await connection.query('SELECT * FROM registro WHERE codRegistro = ? AND estado = ?', [id, 'SIN CONFIRMAR']);
+    const [existingRecord] = await connection.query('SELECT * FROM registro WHERE codRegistro = ? AND estado = ?', [id, 'CONFIRMADO']);
 
     if (existingRecord.length === 0) {
       // Si no se encuentra el registro con el ID y estado correspondiente, devuelve una respuesta indicando que no se puede eliminar
