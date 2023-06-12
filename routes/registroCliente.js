@@ -723,7 +723,7 @@ router.get('/registro/:id', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
-
+/*
 router.post('/validar-cantidad-reserva', async (req, res) => {
   try {
     const connection = await dbConnection(); // Obtén la conexión a la base de datos
@@ -751,6 +751,39 @@ router.post('/validar-cantidad-reserva', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+*/
+router.post('/validar-cantidad-reserva', async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const input = req.body;
+
+    const horaInicial = new Date(`${input.txtFecha} ${input.txtHoraInicial}`);
+    const horaFinal = new Date(`${input.txtFecha} ${input.txtHoraFinal}`);
+
+    const duracionReserva = (horaFinal - horaInicial) / (1000 * 60); // Duración de la reserva en minutos
+
+    // Obtener la cantidad total de minutos registrados para el cliente en la fecha especificada
+    const [existingRecords] = await connection.query(
+      'SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, horainicio, horafinal)), 0) AS totalMinutes FROM registro WHERE codCliente = ? AND fechRegistro = ?',
+      [input.ddlClientes, input.txtFecha]
+    );
+    const { totalMinutes } = existingRecords[0];
+    const suma = parseInt(totalMinutes) + duracionReserva
+    if (suma > 110) {
+      // Si la suma de los minutos registrados y la duración de la reserva superan los 110 minutos, devuelve un mensaje de error
+      res.status(400).json({ error: 'La cantidad total de minutos registrados en el día no puede exceder los 110 minutos.' });
+    } else {
+      // La reserva es válida
+      res.json({ ok: true });
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 
 router.put('/confirmar/:id', verifyToken, async (req, res) => {
   try {
@@ -812,8 +845,11 @@ router.post('/validar-fecha-reserva', async (req, res) => {
 
     // Verificar si hay una campaña que comienza o termina dentro del rango de tiempo de la reserva
     const [existingCampaigns] = await connection.query(
-      'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
-      [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+     // 'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
+     // [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+     'SELECT * FROM registro WHERE ((horainicio <= ? AND horafinal >= ?) OR (horainicio <= ? AND horafinal >= ?)) AND codLocalidad = ? AND fechRegistro = ?',
+      [input.txtHoraInicial, input.txtHoraInicial, input.txtHoraFinal, input.txtHoraFinal, input.ddlLocalidad, input.txtFecha]
+
     );
 
     if (existingCampaigns.length > 0) {
