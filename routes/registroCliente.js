@@ -893,6 +893,4 @@ router.post('/registrar-pago', async (req, res) => {
   }
 });
 
-
-
 module.exports = router;
