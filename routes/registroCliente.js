@@ -236,9 +236,11 @@ router.post('/guardar', verifyToken, async (req, res) => {
             horainicio: input.txtHoraInicial,
             horafinal: input.txtHoraFinal,
             duracion: input.txtTiempo,
-            estado: 'CONFIRMADO',
+            estado: 'SIN CONFIRMAR',
             costoTarifa: input.costoTarifa,
-            comentario: input.txtComentario
+            comentario: input.txtComentario,
+            created_at:input.created_at,
+            updated_at:input.updated_at,
           };
 
           const [results] = await connection.query('INSERT INTO registro SET ?', registro); // Ejecuta la inserción utilizando la conexión
