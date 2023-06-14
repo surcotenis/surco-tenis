@@ -792,9 +792,13 @@ router.put('/confirmar/:id', verifyToken, async (req, res) => {
     const connection = await dbConnection(); // Obtén la conexión a la base de datos
     const id = req.params.id; // Obtén el ID de la campaña de los parámetros de la solicitud
 
-    // Actualiza el estado de la campaña a "CONFIRMADO"
-    const [result] = await connection.query('UPDATE registro SET estado = ? WHERE codRegistro = ?', ['CONFIRMADO', id]);
+    const { venta_id } = req.body;
 
+    const updatedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+
+    // Actualiza el estado de la campaña a "CONFIRMADO"
+    //const [result] = await connection.query('UPDATE registro SET estado = ? WHERE codRegistro = ?  ', ['CONFIRMADO', id]);
+    const [result] = await connection.query('UPDATE registro SET estado = ?, venta_id = ?, updated_at = ? WHERE codRegistro = ?', ['CONFIRMADO', venta_id, updatedAt, id]);
     if (result.affectedRows === 0) {
       // Si no se encuentra la campaña con el ID proporcionado, devuelve una respuesta indicando que no se pudo actualizar
       res.json({ ok: false, message: 'No se encontró la campaña para actualizar el estado.' });
@@ -815,7 +819,7 @@ router.delete('/eliminar/:id', verifyToken, async (req, res) => {
     const id = req.params.id; // Obtén el ID del registro de los parámetros de la solicitud
 
     // Verificar si el registro existe y su estado es "SIN CONFIRMAR"
-    const [existingRecord] = await connection.query('SELECT * FROM registro WHERE codRegistro = ? AND estado = ?', [id, 'CONFIRMADO']);
+    const [existingRecord] = await connection.query('SELECT * FROM registro WHERE codRegistro = ? AND estado = ?', [id, 'SIN CONFIRMAR']);
 
     if (existingRecord.length === 0) {
       // Si no se encuentra el registro con el ID y estado correspondiente, devuelve una respuesta indicando que no se puede eliminar
@@ -869,6 +873,33 @@ router.post('/validar-fecha-reserva', async (req, res) => {
   }
 });
 
+router.post('/registrar-pago', async (req, res) => {
+  try {
+    const connection = await dbConnection(); // Obtén la conexión a la base de datos
+    const input = req.body;
 
+    // Verificar si hay una campaña que comienza o termina dentro del rango de tiempo de la reserva
+    const [existingCampaigns] = await connection.query(
+     // 'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
+     // [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+     'SELECT * FROM pagos WHERE ((horainicio <= ? AND horafinal >= ?) OR (horainicio <= ? AND horafinal >= ?)) AND codLocalidad = ? AND fechRegistro = ?',
+      [input.txtHoraInicial, input.txtHoraInicial, input.txtHoraFinal, input.txtHoraFinal, input.ddlLocalidad, input.txtFecha]
+
+    );
+
+    if (existingCampaigns.length > 0) {
+      // Si hay una campaña que cumple con los criterios, devolver una respuesta indicando que no se puede registrar la reserva
+      res.status(400).json({ error: 'Ya hay una campaña que se superpone en el tiempo asignado.' });
+    } else {
+      // Si no hay campañas que cumplan con los criterios, la reserva es válida
+      res.json({ ok: true });
+    }
+
+    connection.release(); // Libera la conexión del pool cuando hayas terminado
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
 
 module.exports = router;
