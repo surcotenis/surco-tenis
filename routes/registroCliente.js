@@ -407,6 +407,7 @@ router.get('/listar-cliente/:id', verifyToken, async (req, res) => {
         JOIN localidad ON registro.codLocalidad = localidad.codLocalidad
       WHERE
         registro.codCliente = ?
+      AND registro.estado = "CONFIRMADO"  
       ORDER BY
         registro.fechRegistro DESC,
         registro.horainicio DESC`;
@@ -878,28 +879,20 @@ router.post('/registrar-pago', async (req, res) => {
     const connection = await dbConnection(); // Obtén la conexión a la base de datos
     const input = req.body;
 
-    // Verificar si hay una campaña que comienza o termina dentro del rango de tiempo de la reserva
-    const [existingCampaigns] = await connection.query(
-     // 'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
-     // [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
-     'SELECT * FROM pagos WHERE ((horainicio <= ? AND horafinal >= ?) OR (horainicio <= ? AND horafinal >= ?)) AND codLocalidad = ? AND fechRegistro = ?',
-      [input.txtHoraInicial, input.txtHoraInicial, input.txtHoraFinal, input.txtHoraFinal, input.ddlLocalidad, input.txtFecha]
-
+    await connection.query(
+      'INSERT INTO pagos (fechaPago, metodoPago, importePago, codRegistro, codCaja) VALUES (?, ?, ?, ?, ?)',
+      [input.fechaPago, "PASARELA DE PAGO", input.importePago, input.codRegistro, 8 ]
     );
 
-    if (existingCampaigns.length > 0) {
-      // Si hay una campaña que cumple con los criterios, devolver una respuesta indicando que no se puede registrar la reserva
-      res.status(400).json({ error: 'Ya hay una campaña que se superpone en el tiempo asignado.' });
-    } else {
-      // Si no hay campañas que cumplan con los criterios, la reserva es válida
-      res.json({ ok: true });
-    }
+    res.json({ ok: true, message: 'Registro de pago exitoso' });
 
     connection.release(); // Libera la conexión del pool cuando hayas terminado
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    res.status(500).json({ error: 'Error en el servidor al registrar el pago' });
   }
 });
+
+
 
 module.exports = router;
