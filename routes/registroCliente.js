@@ -407,7 +407,6 @@ router.get('/listar-cliente/:id', verifyToken, async (req, res) => {
         JOIN localidad ON registro.codLocalidad = localidad.codLocalidad
       WHERE
         registro.codCliente = ?
-      AND registro.estado = "CONFIRMADO"  
       ORDER BY
         registro.fechRegistro DESC,
         registro.horainicio DESC`;
