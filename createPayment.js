@@ -2,13 +2,16 @@ const axios = require('axios').default
 
 exports.createFormToken = async paymentConf => {
   // format: 123456789
-  const username = process.env.IZIPAY_USERNAME
+  let username = process.env.IZIPAY_USERNAME  
+  let endpoint = process.env.IZIPAY_ENDPOINT
+  let password
 
-  // format: testprivatekey_XXXXXXX
-  const password = process.env.IZIPAY_PASSPORD
-
-  // format: api.my.psp.domain.name without https
-  const endpoint = process.env.IZIPAY_ENDPOINT
+  if(process.env.MODE === "TEST") {
+    password = process.env.IZIPAY_PASSPORD_TEST;
+  }
+  else {
+    password = process.env.IZIPAY_PASSPORD;
+  }
 
   const createPaymentEndpoint = `https://${username}:${password}@${endpoint}/api-payment/V4/Charge/CreatePayment`
 
