@@ -54,6 +54,8 @@ let hmac
     hmac = process.env.IZIPAY_HMAC;
   }
   const answer = req.body.clientAnswer
+  console.log(answer.customer.billingDetails)
+  
   const hash = req.body.hash
   const answerHash = Hex.stringify(
     hmacSHA256(JSON.stringify(answer), hmac)

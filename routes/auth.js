@@ -92,7 +92,8 @@ router.post('/login', [
       token,
       codCliente: cliente.codCliente,
       nombre: cliente.nombres,
-      tipo: cliente.tipo
+      tipo: cliente.tipo,
+      email: cliente.email
     });
   } catch (error) {
     console.error(error);
