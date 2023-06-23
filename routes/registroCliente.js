@@ -204,8 +204,10 @@ router.post('/guardar', verifyToken, async (req, res) => {
     if (validarFecha(-1, input.ddlLocalidad, input.txtFecha, input.txtHoraInicial, input.txtHoraFinal)) {
       // Verificar si hay una campaña que comienza en la misma hora
       const [existingCampaigns] = await connection.query(
-        'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
-      [input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+      //  'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
+      //[input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+      'SELECT * FROM registro WHERE ((horainicio <= ? AND horafinal >= ?) OR (horainicio <= ? AND horafinal >= ?)) AND codLocalidad = ? AND fechRegistro = ?',
+      [input.txtHoraInicial, input.txtHoraInicial, input.txtHoraFinal, input.txtHoraFinal, input.ddlLocalidad, input.txtFecha]
       );
 
       if (existingCampaigns.length > 0) {
@@ -241,6 +243,7 @@ router.post('/guardar', verifyToken, async (req, res) => {
             comentario: input.txtComentario,
             created_at:input.created_at,
             updated_at:input.updated_at,
+            venta_id:input.venta_id
           };
 
           const [results] = await connection.query('INSERT INTO registro SET ?', registro); // Ejecuta la inserción utilizando la conexión
@@ -798,7 +801,7 @@ router.put('/confirmar/:id', verifyToken, async (req, res) => {
 
     // Actualiza el estado de la campaña a "CONFIRMADO"
     //const [result] = await connection.query('UPDATE registro SET estado = ? WHERE codRegistro = ?  ', ['CONFIRMADO', id]);
-    const [result] = await connection.query('UPDATE registro SET estado = ?, venta_id = ?, updated_at = ? WHERE codRegistro = ?', ['CONFIRMADO', venta_id, updatedAt, id]);
+    const [result] = await connection.query('UPDATE registro SET estado = ?, updated_at = ? WHERE codRegistro = ?', ['CONFIRMADO', updatedAt, id]);
     if (result.affectedRows === 0) {
       // Si no se encuentra la campaña con el ID proporcionado, devuelve una respuesta indicando que no se pudo actualizar
       res.json({ ok: false, message: 'No se encontró la campaña para actualizar el estado.' });
