@@ -669,34 +669,6 @@ router.post('/precio', verifyToken, async (req, res) => {
   }
 });
 
-/*
-router.post('/validar-fecha-reserva', async (req, res) => {
-  try {
-    const connection = await dbConnection(); // Obtén la conexión a la base de datos
-    const input = req.body;
-
-    // Verificar si hay una campaña que comienza en la misma hora y localidad
-    const [existingCampaigns] = await connection.query(
-      'SELECT * FROM registro WHERE horainicio = ? AND codLocalidad = ? AND fechRegistro = ?',
-      [input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
-    );
-
-    if (existingCampaigns.length > 0) {
-      // Si hay una campaña que comienza en la misma hora y localidad, devolver una respuesta indicando que no se puede registrar la reserva
-      //res.json({ ok: false, message: 'Ya hay una campaña que comienza en la misma hora y localidad.' });
-      res.status(400).json({ error: 'Ya hay una campaña que comienza en la misma hora y localidad.' });
-    } else {
-      // Si no hay campañas que cumplan con los criterios, la reserva es válida
-      res.json({ ok: true });
-    }
-
-    connection.release(); // Libera la conexión del pool cuando hayas terminado
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error en el servidor' });
-  }
-});
-*/
 router.get('/registro/:id', async (req, res) => {
   try {
     const registroId = req.params.id;
