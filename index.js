@@ -31,8 +31,6 @@ app.use("/api/cliente",clienteRouter)
 app.post('/createPayment', async (req, res) => {
   const paymentConf = req.body.paymentConf
 
-  console.log({paymentConf})
-
   try {
     const formToken = await createFormToken(paymentConf)
     res.send(formToken)
@@ -54,7 +52,6 @@ let hmac
     hmac = process.env.IZIPAY_HMAC;
   }
   const answer = req.body.clientAnswer
-  console.log(answer.customer.billingDetails)
   
   const hash = req.body.hash
   const answerHash = Hex.stringify(
