@@ -15,6 +15,7 @@ const clienteRouter = require("./routes/cliente")
 const { createFormToken } = require('./createPayment')
 const hmacSHA256 = require('crypto-js/hmac-sha256')
 const Hex = require('crypto-js/enc-hex')
+const forgotpasswordRouter = require("./routes/forgotPasswordControler")
 
 app.use(express.json())
 app.use(cors())
@@ -26,6 +27,8 @@ app.use("/api/listado-Registro", listadoRegistro)
 app.use("/api/registro-cliente", registroCliente)
 app.use("/api/localidad", localidadRouter)
 app.use("/api/cliente",clienteRouter)
+app.use("/api/forgotpassword",forgotpasswordRouter)
+
 
 
 app.post('/createPayment', async (req, res) => {
