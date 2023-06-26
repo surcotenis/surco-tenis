@@ -64,8 +64,6 @@ let hmac
 dbConnection()
   .then((connection) => {
     console.log('Successful connection to the database.');
-    // Realiza las operaciones que necesites con la conexión
-    // ...
     connection.release(); // Importante liberar la conexión después de usarla
     app.listen(port, () => {
       console.log('API Server of tennis running');
