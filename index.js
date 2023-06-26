@@ -40,9 +40,6 @@ app.post('/createPayment', async (req, res) => {
   }
 })
 
-/**
- * Validates the given payment data (hash)
- */
 app.post('/validatePayment', (req, res) => {
 let hmac
   if(process.env.MODE === "TEST") {
@@ -64,7 +61,7 @@ let hmac
 dbConnection()
   .then((connection) => {
     console.log('Successful connection to the database.');
-    connection.release(); // Importante liberar la conexión después de usarla
+    connection.release();
     app.listen(port, () => {
       console.log('API Server of tennis running');
     });
