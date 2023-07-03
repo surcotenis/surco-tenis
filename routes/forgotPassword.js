@@ -85,7 +85,7 @@ router.post('/', async (req, res) => {
             <h1>¡Gracias por solicitar recuperar contraseña en Surco Tenis!</h1>
             <p>Hola ${cliente.nombres},</p>
             <p>Has solicitado recuperar tu contraseña. Haz clic en el siguiente enlace para restablecerla:</p>
-            <a href="http://localhost:4200/#/reserve/reset-password?token=${token}">Restablecer contraseña</a>
+            <a href="https://reservas.surcotenis.pe/#/reserve/reset-password?token=${token}">Restablecer contraseña</a>
             <p>El enlace es válido por 1 hora.</p>
             <p>Si no solicitaste restablecer tu contraseña, ignora este correo.</p>
             <p>Saludos,</p>
