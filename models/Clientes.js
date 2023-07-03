@@ -70,6 +70,26 @@ const Cliente = {
       throw new Error(error);
     }
   },
+  updateToken: async (clienteId, token) => {
+    try {
+      const connection = await dbConnection();
+      const query = 'UPDATE cliente SET remember_token = ? WHERE codCliente = ?';
+      await connection.query(query, [token, clienteId]);
+      connection.release();
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+  updatePassword: async (clienteId, hashedPassword) => {
+    try {
+      const connection = await dbConnection();
+      const query = 'UPDATE cliente SET password = ? WHERE codCliente = ?';
+      await connection.query(query, [hashedPassword, clienteId]);
+      connection.release();
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
 };
 
 module.exports = Cliente;
