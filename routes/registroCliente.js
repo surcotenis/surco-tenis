@@ -247,7 +247,8 @@ router.post('/guardar', verifyToken, async (req, res) => {
             comentario: input.txtComentario,
             created_at:input.created_at,
             updated_at:input.updated_at,
-            venta_id:input.venta_id
+            venta_id:input.venta_id,
+            version:input.version
           };
 
           const [results] = await connection.query('INSERT INTO registro SET ?', registro); // Ejecuta la inserción utilizando la conexión
