@@ -3,6 +3,9 @@ const router = express.Router();
 const dbConnection = require('../core/db_config'); // Importa el módulo para acceder a la base de datos
 const moment = require('moment');
 const {verifyToken, verifyTokenAndAuthorization} =require("./verifyToken")
+const { Mutex } = require('async-mutex');
+const mutex = new Mutex();
+
 
 router.get('/listar/', async (req, res) => {
   try {
@@ -198,17 +201,18 @@ router.post('/guardar', verifyToken, async (req, res) => {
 */
 router.post('/guardar', verifyToken, async (req, res) => {
   try {
+    await mutex.acquire();
     const connection = await dbConnection(); // Obtén la conexión a la base de datos
     const input = req.body;
 
     if (validarFecha(-1, input.ddlLocalidad, input.txtFecha, input.txtHoraInicial, input.txtHoraFinal)) {
       // Verificar si hay una campaña que comienza en la misma hora
       const [existingCampaigns] = await connection.query(
-      //  'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
-      //[input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
-      'SELECT * FROM registro WHERE ((horainicio <= ? AND horafinal >= ?) OR (horainicio <= ? AND horafinal >= ?)) AND codLocalidad = ? AND fechRegistro = ?',
-      [input.txtHoraInicial, input.txtHoraInicial, input.txtHoraFinal, input.txtHoraFinal, input.ddlLocalidad, input.txtFecha]
-      );
+        //  'SELECT * FROM registro WHERE (horainicio <= ? AND horafinal >= ? ) AND codLocalidad = ? AND fechRegistro = ?',
+        //[input.txtHoraInicial, input.txtHoraInicial, input.ddlLocalidad, input.txtFecha]
+        'SELECT * FROM registro WHERE ((horainicio <= ? AND horafinal >= ?) OR (horainicio <= ? AND horafinal >= ?)) AND codLocalidad = ? AND fechRegistro = ?',
+        [input.txtHoraInicial, input.txtHoraInicial, input.txtHoraFinal, input.txtHoraFinal, input.ddlLocalidad, input.txtFecha]
+        );
 
       if (existingCampaigns.length > 0) {
         // Si hay una campaña que comienza en la misma hora y localidad, devolver una respuesta indicando que no se puede registrar la reserva
@@ -259,6 +263,8 @@ router.post('/guardar', verifyToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error en la base de datos' });
+  }finally {
+    mutex.release();
   }
 });
 
