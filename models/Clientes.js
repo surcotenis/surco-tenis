@@ -90,6 +90,21 @@ const Cliente = {
       throw new Error(error);
     }
   },
+  findOneDni:async (conditions) => {
+    try {
+      const connection = await dbConnection();
+      const query = 'SELECT * FROM cliente WHERE ?';
+      const [results] = await connection.query(query, conditions);
+      connection.release();
+      if (results.length > 0) {
+        return results[0];
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
 };
 
 module.exports = Cliente;

@@ -52,6 +52,12 @@ router.post('/', [
      return res.status(400).json({ error: 'El cliente ya está registrado' });
    }
 
+   const existingDni = await Cliente.findOneDni( { numDocumento } );
+   if (existingDni) {
+     return res.status(400).json({ error: 'El cliente ya está registrado' });
+   }
+
+
     // Crear una instancia del cliente
     const clienteData = {
         numDocumento,
