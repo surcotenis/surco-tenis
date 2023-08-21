@@ -86,12 +86,12 @@ router.post('/', [
       port: 465,
       secure: true,
       auth: {
-        user: 'systemdevsperu@gmail.com',
-        pass: 'jwgnmcwgimptuirf',
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
       },
     });
     var mailOptions = {
-      from: 'systemdevsperu@gmail.com',
+      from: process.env.EMAIL_USERNAME,
       to: email, // Utilizamos el correo del usuario registrado como destinatario
       subject: 'Registro exitoso',
       html: `
