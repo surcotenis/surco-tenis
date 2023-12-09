@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "etc/secrets/tenis" })
+require("dotenv").config()
 const express = require("express")
 const session = require('express-session')
 const app = express()
