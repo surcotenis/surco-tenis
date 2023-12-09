@@ -1,6 +1,5 @@
 const mysql = require('mysql2/promise');
-require("dotenv").config({ path: "/etc/secrets/tenis" })
-console.log(process.env.HOST)
+console.log("test 3"process.env.HOST)
 const pool = mysql.createPool({
   host: process.env.HOST,
   user: process.env.USER,
