@@ -61,6 +61,7 @@ const jwt = require('jsonwebtoken');
 const Cliente = require('../models/Clientes'); // Asumiendo que tienes un modelo llamado Cliente
 
 // Ruta de inicio de sesión
+// En tu router
 router.post('/login', [
   check('email').notEmpty().withMessage('El correo electrónico es requerido').isEmail().withMessage('El correo electrónico no es válido'),
   check('password').notEmpty().withMessage('La contraseña es requerida'),
@@ -78,6 +79,12 @@ router.post('/login', [
     if (!cliente) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
+
+    // Verificar si la respuesta contiene un error (cliente inactivo)
+    if (cliente.error) {
+      return res.status(403).json({ error: cliente.error });
+    }
+
     // Verificar la contraseña
     const isPasswordValid = await bcrypt.compare(password, cliente.password);
     if (!isPasswordValid) {
@@ -100,7 +107,6 @@ router.post('/login', [
     return res.status(500).json({ error: 'Error en el inicio de sesión' });
   }
 });
-
 // Ruta de cierre de sesión (no es necesario con JWT, ya que los tokens son autónomos)
 // Puedes agregar una lógica adicional si lo deseas, como invalidar el token en el servidor
 
