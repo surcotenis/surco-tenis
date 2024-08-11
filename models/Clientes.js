@@ -55,21 +55,47 @@ const Cliente = {
 
   // Otros métodos del modelo Cliente, como findAll, findById, update, delete, etc.
 
+  // findOne: async (conditions) => {
+  //   try {
+  //     const connection = await dbConnection();
+  //     const query = 'SELECT * FROM cliente WHERE ?';
+  //     const [results] = await connection.query(query, conditions);
+  //     connection.release();
+  //     if (results.length > 0) {
+  //       return results[0];
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     throw new Error(error);
+  //   }
+  // },
+
   findOne: async (conditions) => {
     try {
       const connection = await dbConnection();
       const query = 'SELECT * FROM cliente WHERE ?';
       const [results] = await connection.query(query, conditions);
       connection.release();
+      
       if (results.length > 0) {
-        return results[0];
+        const cliente = results[0];
+        if (cliente.estado === 'ACTIVO') {
+          return cliente;
+        } else {
+          // Cliente inactivo, no permitir el inicio de sesión y enviar un mensaje
+          return { error: 'Este usuario ha sido desactivado. Comuníquese con el administrador.' };
+        }
       } else {
+        // Cliente no encontrado
         return null;
       }
     } catch (error) {
       throw new Error(error);
     }
   },
+
+
   updateToken: async (clienteId, token) => {
     try {
       const connection = await dbConnection();
