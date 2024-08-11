@@ -17,6 +17,7 @@ const hmacSHA256 = require('crypto-js/hmac-sha256')
 const Hex = require('crypto-js/enc-hex')
 const forgotPassword = require("./routes/forgotPassword")
 const moment = require('moment-timezone');
+const ipnRouter = require('./routes/ipn'); // Asegúrate de que la ruta es correcta
 
 app.use(express.json())
 app.use(cors())
@@ -29,6 +30,7 @@ app.use("/api/registro-cliente", registroCliente)
 app.use("/api/localidad", localidadRouter)
 app.use("/api/cliente",clienteRouter)
 app.use("/api/forgot-password",forgotPassword)
+app.use('/api/ipn', ipnRouter);
 
 app.get('/current-time', (req, res) => {
   const currentTime = moment().tz('America/Lima').format('YYYY-MM-DD HH:mm:ss');
